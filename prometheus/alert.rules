@@ -1,0 +1,76 @@
+groups:
+- name: example
+  rules:
+
+  # Alert for any instance that is unreachable for >2 minutes.
+  - alert: service_down
+    expr: up == 0
+    for: 2m
+    labels:
+      severity: page
+    annotations:
+# summary: "Instance {{ $labels.instance }} down"
+      summary: "Job {{ $labels.job }} down"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
+
+## High load
+  - alert: high_load
+    expr: node_load1 > 5
+    for: 2m
+    labels:
+      severity: page
+    annotations:
+      summary: "Instance {{ $labels.instance }} under high load"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} is under high load."
+
+## High CPU usage 
+  - alert: HighCPUUsage
+    expr: 100 * (1 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance)) > 90
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: High CPU usage on instance {{ $labels.instance }}
+      description: CPU usage is above 90% for the last 5 minutes for {{ $labels.instance }} of job {{ $labels.job }}.
+
+## High memory usage
+  - alert: HighMemoryUsage
+    expr: node_memory_Active_bytes / node_memory_MemTotal_bytes * 100 > 80
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: High memory usage on instance {{ $labels.instance }}
+      description: Memory usage is above 80% for the last 10 minutes.
+
+
+## High Memory Usage on Host Server
+  - alert: HighMemoryUsage
+    expr: (node_memory_usage_bytes / node_memory_limit_bytes) * 100 > 90
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: High Memory Usage on Host Server
+      description: Memory usage is above 90% on the host server for the last 5 minutes.
+
+## High Storage Usage on Host Server 
+  - alert: HighStorageUsage
+    expr: (node_filesystem_usage_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 > 90
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: High Storage Usage on Host Server
+      description: Storage usage is above 90% on the host server for the last 5 minutes.
+
+## Low data disk space
+  - alert: 'Low data disk space'
+    expr: ceil(((node_filesystem_size_bytes{mountpoint!="/boot"} - node_filesystem_free_bytes{mountpoint!="/boot"}) / node_filesystem_size_bytes{mountpoint!="/boot"} * 100)) > 95
+    labels:
+      severity: 'critical'
+    annotations:
+      title: "Disk Usage"
+      description: 'Partition : {{$labels.mountpoint}}'
+      summary: "Disk usage is `{{humanize $value}}%`"
+      host: "{{$labels.instance}}"
