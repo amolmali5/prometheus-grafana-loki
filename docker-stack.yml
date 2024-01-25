@@ -132,9 +132,9 @@ services:
     volumes:
       - /var/log:/var/log
       - /opt/scripts/applogs/live_logs:/opt/scripts/applogs/live_logs
-      - ./promtail/config.yml:/etc/promtail/config.yml
+      - ./promtail/config.yaml:/etc/promtail/config.yaml
     command:
-      - '--config.file=/etc/promtail/config.yml'
+      - '--config.file=/etc/promtail/config.yaml'
       - '--config.expand-env=true'
     networks:
       - monitor-net
@@ -156,22 +156,3 @@ services:
           #      - 9091:9091
           #    networks:
           #      - monitor-net
-#
-#
-#  mongodb_exporter:
-#    image: bitnami/mongodb-exporter
-#    ports:
-#      - 9104:9104
-#    environment:
-#      - MONGODB_URI=mongodb://mongo-admin:aspen_2023@13.232.149.57:27018
-#    networks:
-#      - monitor-net
-#    deploy:
-#      mode: global
-#      restart_policy:
-#          condition: on-failure
-
-          #networks:
-          #  monitor-net:
-          #    external: true
-          #    name: prom_default

@@ -124,9 +124,9 @@ services:
     volumes:
       - /var/log:/var/log
       - /opt/scripts/applogs/live_logs:/opt/scripts/applogs/live_logs
-      - /opt/prometheus/promtail/config.yml:/etc/promtail/config.yml
+      - /opt/prometheus/promtail/config.yaml:/etc/promtail/config.yaml
     command:
-      - '--config.file=/etc/promtail/config.yml'
+      - '--config.file=/etc/promtail/config.yaml'
       - '--config.expand-env=true'
     networks:
       - back-tier
