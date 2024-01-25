@@ -123,7 +123,7 @@ services:
     image: grafana/promtail:2.8.0
     volumes:
       - /var/log:/var/log
-      - /opt/scripts/applogs/live_logs:/opt/scripts/applogs/live_logs
+      - /opt/live_logs:/opt/live_logs
       - /opt/prometheus/promtail/config.yaml:/etc/promtail/config.yaml
     command:
       - '--config.file=/etc/promtail/config.yaml'
