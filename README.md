@@ -12,7 +12,7 @@ If you would like to change which targets should be monitored or make configurat
 
 Once configurations are done let's start it up. From the /prometheus project directory run the following command:
 
-    $ HOSTNAME=$(hostname) docker stack deploy -c docker-stack.yml prom
+    HOSTNAME=$(hostname) docker stack deploy -c docker-stack.yml prom
 
 
 That's it the `docker stack deploy' command deploys the entire Grafana and Prometheus stack automatically to the Docker Swarm. By default cAdvisor and node-exporter are set to Global deployment which means they will propogate to every docker host attached to the Swarm.
@@ -24,15 +24,15 @@ The Grafana Dashboard is now accessible via: `http://<Host IP Address>:3000` for
 
 In order to check the status of the newly created stack:
 
-    $ docker stack ps prom
+    docker stack ps prom
 
 View running services:
 
-    $ docker service ls
+    docker service ls
 
 View logs for a specific service
 
-    $ docker service logs prom_<service_name>
+    docker service logs prom_<service_name>
 
 
 ## Add Datasources and Dashboards
@@ -49,7 +49,7 @@ Go to Grafana Dashboard and simply select Import from the Grafana menu -> Dashbo
 
 This dashboard is intended to help you get started with monitoring.
 
-Added more dashbords like ID 13112, 16310 and will be adding more in future.
+Added more dashboards like ID 13112, 16310 and will be adding more in future.
 
 ### Add Additional Datasources
 Now we need to create the Prometheus Datasource in order to connect Grafana to Prometheus 
@@ -96,8 +96,16 @@ Let this run for a few minutes and you will notice the load alert appear. Then C
 
 ## Logs Visulization with Loki and Promtail
 
-To monitor system logs, configuration is laready ready in [/promtal/local-config.yaml] (promtail/local-config.yaml).
+To monitor system logs, configuration is aready ready in [/promtal/config.yaml](promtail/config.yaml).
 
-If you want to monitor docker logs then create a directory and maintain dlogs file there and add that path in commented lines in [/promtal/local-config.yaml] (promtail/local-config.yaml).
+If you want to monitor docker logs then create a directory and maintain the logs file there and add that path in commented lines in [/promtal/config.yaml](promtail/config.yaml).
 
 For mor details go through [Loki] (https://github.com/grafana/loki/tree/main/production)
+
+
+
+
+# To remove stack
+```
+docker stack rm prom
+```
