@@ -112,7 +112,7 @@ services:
     ports:
       - "3100:3100"
     volumes:
-      - /opt/prometheus/loki/:/etc/loki/
+      - ./loki/:/etc/loki/
     command:
       - '--config.file=/etc/loki/local-config.yaml'
     networks:
@@ -123,8 +123,9 @@ services:
     image: grafana/promtail:2.8.0
     volumes:
       - /var/log:/var/log
-      - /opt/live_logs:/opt/live_logs
-      - /opt/prometheus/promtail/config.yaml:/etc/promtail/config.yaml
+      - ./promtail/config.yaml:/etc/promtail/config.yaml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
     command:
       - '--config.file=/etc/promtail/config.yaml'
       - '--config.expand-env=true'

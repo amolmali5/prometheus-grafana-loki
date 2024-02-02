@@ -98,7 +98,17 @@ Let this run for a few minutes and you will notice the load alert appear. Then C
 
 To monitor system logs, configuration is aready ready in [/promtal/config.yaml](promtail/config.yaml).
 
-If you want to monitor docker logs then create a directory as /opt/live_logs and maintain the logs file there and add that path in commented lines in [/promtal/config.yaml](promtail/config.yaml).
+To view the docker container logs, add only labels shown as in example to the docker container/services in docker-compose/docker-stack, whose logs you wants to moniotor. Then go to the grafana and you can see the conatiner names in loki datasouce query section.
+```
+ nginx-app:
+    container_name: nginx-app
+    image: nginx
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
+```
+
+If you want to monitor any other logs then provide that file path in commented lines in [/promtal/config.yaml](promtail/config.yaml).
 
 For mor details go through [Loki] (https://github.com/grafana/loki/tree/main/production)
 

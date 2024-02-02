@@ -9,6 +9,21 @@ clients:
   - url: http://loki:3100/loki/api/v1/push
 
 scrape_configs:
+- job_name: flog_scrape
+  docker_sd_configs:
+    - host: unix:///var/run/docker.sock
+      refresh_interval: 5s
+      filters:
+        - name: label
+          values: ["logging=promtail"]
+  relabel_configs:
+    - source_labels: ['__meta_docker_container_name']
+      regex: '/(.*)'
+      target_label: 'container'
+    - source_labels: ['__meta_docker_container_log_stream']
+      target_label: 'logstream'
+    - source_labels: ['__meta_docker_container_label_logging_jobname']
+      target_label: 'job'
 - job_name: system
   static_configs:
   - targets:
@@ -16,10 +31,10 @@ scrape_configs:
     labels:
       job: varlogs
       __path__: /var/log/*log
-#- job_name: Docker_logs
+#- job_name: applogs
 #  static_configs:
 #  - targets:
 #      - localhost
 #    labels:
 #      job: backendlogs
-#      __path__: /opt/live_logs/*    //path for directory in which docker container logs are stored
+#      __path__: /opt/live_logs/*    //path for directory in which app logs are stored
