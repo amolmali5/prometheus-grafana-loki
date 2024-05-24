@@ -15,7 +15,7 @@ Once configurations are done let's start it up. From the /prometheus project dir
     HOSTNAME=$(hostname) docker stack deploy -c docker-stack.yml prom
 
 
-That's it the `docker stack deploy' command deploys the entire Grafana and Prometheus stack automatically to the Docker Swarm. By default cAdvisor and node-exporter are set to Global deployment which means they will propogate to every docker host attached to the Swarm.
+That's it the `docker stack deploy' command deploys the entire Grafana and Prometheus stack automatically to the Docker Swarm. By default cAdvisor and node-exporter are set to Global deployment which means they will propagate to every docker host attached to the Swarm.
 
 The Grafana Dashboard is now accessible via: `http://<Host IP Address>:3000` for example http://192.168.10.1:3000
 
@@ -108,7 +108,7 @@ To view the docker container logs, add only labels shown as in example to the do
       logging_jobname: "containerlogs"
 ```
 
-If you want to monitor any other logs then provide that file path in commented lines in [/promtal/config.yaml](promtail/config.yaml).
+If you want to monitor any other logs then provide that file path in commented lines in [/promtail/config.yaml](promtail/config.yaml).
 
 For mor details go through [Loki] (https://github.com/grafana/loki/tree/main/production)
 
