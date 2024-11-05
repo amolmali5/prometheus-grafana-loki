@@ -8,35 +8,46 @@ Before we get started installing the Prometheus stack. Ensure you install the la
 # Installation & Configuration
 Clone the project locally to your Docker host.
 
-If you would like to change which targets should be monitored or make configuration changes edit the [/prometheus/prometheus.yml](prometheus/prometheus.yml) file. The targets section is where you define what should be monitored by Prometheus. The names defined in this file are actually sourced from the service name in the docker-compose file. If you wish to change names of the services you can add the "container_name" parameter in the `docker-compose.yml` file.
+If you would like to change which targets should be monitored or make configuration changes edit the [/prometheus/prometheus.yaml](prometheus/prometheus.yaml) file. The targets section is where you define what should be monitored by Prometheus. The names defined in this file are actually sourced from the service name in the docker-compose file. If you wish to change names of the services you can add the "container_name" parameter in the `docker-compose.yaml` file.
+
 
 Once configurations are done let's start it up. From the /prometheus project directory run the following command:
 
-    HOSTNAME=$(hostname) docker stack deploy -c docker-stack.yml prom
+1. To use the docker-compose file
 
+    ```
+    docker compose up -d
+    ```
+
+2. To use the docker-stack file
+    ```
+    HOSTNAME=$(hostname) docker stack deploy -c docker-stack.yaml prom
+    ```
+    * In order to check the status of the newly created stack:
+        ```
+        docker stack ps prom
+        ```
+
+    * View running services:
+        ```
+         docker service ls
+        ```
+    * View logs for a specific service
+        ```
+        docker service logs prom_<service_name>
+        ```
 
 That's it the `docker stack deploy' command deploys the entire Grafana and Prometheus stack automatically to the Docker Swarm. By default cAdvisor and node-exporter are set to Global deployment which means they will propagate to every docker host attached to the Swarm.
 
-The Grafana Dashboard is now accessible via: `http://<Host IP Address>:3000` for example http://192.168.10.1:3000
+This will create a folder named grafana_data for grafana database.
 
+The Grafana Dashboard is now accessible via: `http://<Host IP Address>:3000` for example http://192.168.10.1:3000
+```
 	username - admin
 	password - v12as34t (Password is stored in the `/grafana/config.monitoring` env file)
-
-In order to check the status of the newly created stack:
-
-    docker stack ps prom
-
-View running services:
-
-    docker service ls
-
-View logs for a specific service
-
-    docker service logs prom_<service_name>
-
-
+```
 ## Add Datasources and Dashboards
-Grafana version 5.0.0 has introduced the concept of provisioning. This allows us to automate the process of adding Datasources & Dashboards. The [/grafana/provisioning](grafana/provisioning) directory contains the `datasources` which has two datasouces [prometheus](grafana/provisioning/datasources/datasource.yml) and [loki](grafana/provisioning/datasources/ds.yml) and `dashboards` directories. These directories contain YAML files which allow us to specify which datasource or dashboards should be installed. 
+Grafana version 5.0.0 has introduced the concept of provisioning. This allows us to automate the process of adding Datasources & Dashboards. The [/grafana/provisioning](grafana/provisioning) directory contains the `datasources` which has two datasouces [prometheus](grafana/provisioning/datasources/datasource.yaml) and [loki](grafana/provisioning/datasources/ds.yaml) and `dashboards` directories. These directories contain YAML files which allow us to specify which datasource or dashboards should be installed. 
 
 If you would like to automate the installation of additional dashboards just copy the Dashboard `JSON` file to `/grafana/provisioning/dashboards` and it will be provisioned next time you stop and start Grafana.
 
@@ -65,12 +76,12 @@ Now we need to create the Prometheus Datasource in order to connect Grafana to P
 Alerting has been added to the stack with Email and Slack integration. Alerts have been added and are managed
 
 Alerts              - `prometheus/alert.rules`
-Email configuration - `alertmanager/config.yml`
+Email configuration - `alertmanager/config.yaml`
 
 The Email configuration requires to build custom integration.
-Edit the [/alertmanager/config.yml](alertmanager/config.yml) and add your email address (to and from), password and smarthost (make sure you have enabled SMTP AUTH service for "from" email)  
+Edit the [/alertmanager/config.yaml](alertmanager/config.yaml) and add your email address (to and from), password and smarthost (make sure you have enabled SMTP AUTH service for "from" email)  
 
-Slack configuration - `alertmanager/config.yml`
+Slack configuration - `alertmanager/config.yaml`
 
 The Slack configuration requires to build a custom integration.
 * Open your slack team in your browser `https://<your-slack-team>.slack.com/apps`
@@ -79,7 +90,7 @@ The Slack configuration requires to build a custom integration.
 * Click on the "incoming webhook integration" link
 * Select which channel
 * Click on Add Incoming WebHooks integration
-* Copy the Webhook URL into the `alertmanager/config.yml` URL section
+* Copy the Webhook URL into the `alertmanager/config.yaml` URL section
 * Fill in Slack username and channel
 
 View Prometheus alerts `http://<Host IP Address>:9090/alerts`
@@ -112,10 +123,12 @@ If you want to monitor any other logs then provide that file path in commented l
 
 For mor details go through [Loki] (https://github.com/grafana/loki/tree/main/production)
 
-
-
-
-# To remove stack
-```
-docker stack rm prom
-```
+# To remove everything
+1. If docker-compose file used:
+    ```
+    docker compose down
+    ```
+2. If docker-stack file used:
+    ```
+    docker stack rm prom
+    ```

@@ -1,0 +1,25 @@
+#route:
+#  receiver: 'slack'
+#
+#receivers:
+#  - name: 'slack'
+#       slack_configs:
+#           - send_resolved: true
+#             username: '<username>'
+#             channel: '#<channel-name>'
+#             api_url: '<incomming-webhook-url>'
+
+          
+route:
+  receiver: 'gmail'
+
+receivers:
+  - name: 'gmail'
+    email_configs:
+      - to: '<email ID>'
+        from: '<email ID>'
+        smarthost: 'smtp.gmail.com:587'        
+        auth_username: '<email ID>'
+        auth_password: '<password>'
+        send_resolved: true
+        require_tls: true
