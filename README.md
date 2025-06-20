@@ -1,11 +1,14 @@
-# Prometheus and Grafana
-This repo contains installation guide for prometheus and grafana along with some other services
+# 📡 Prometheus & 📊 Grafana Monitoring Stack
+This repository provides installation and configuration guides for Prometheus, Grafana, and complementary observability tools.
+
+> Includes Prometheus, Grafana, Loki, Alertmanager, Node Exporter, cAdvisor, and Promtail — deployable via Docker Compose or Swarm.
 
 
-# Pre-requisites
+
+# ⚙️ Pre-requisites
 Before we get started installing the Prometheus stack. Ensure you install the latest version of [docker] (https://docs.docker.com/engine/install/) and [docker swarm](https://docs.docker.com/engine/swarm/swarm-tutorial/) on your Docker host machine. Docker Swarm is installed automatically when using Docker for Mac or Docker for Windows.
 
-# Installation & Configuration
+# 🚀 Installation & Configuration
 Clone the project locally to your Docker host.
 
 If you would like to change which targets should be monitored or make configuration changes edit the [/prometheus/prometheus.yaml](prometheus/prometheus.yaml) file. The targets section is where you define what should be monitored by Prometheus. The names defined in this file are actually sourced from the service name in the docker-compose file. If you wish to change names of the services you can add the "container_name" parameter in the `docker-compose.yaml` file.
@@ -21,11 +24,11 @@ Once configurations are done let's start it up. From the /prometheus project dir
 
 2. To use the docker-stack file
     ```
-    HOSTNAME=$(hostname) docker stack deploy -c docker-stack.yaml prom
+    docker stack deploy -c docker-stack.yaml monitoring
     ```
     * In order to check the status of the newly created stack:
         ```
-        docker stack ps prom
+        docker stack ps monitoring
         ```
 
     * View running services:
@@ -34,7 +37,7 @@ Once configurations are done let's start it up. From the /prometheus project dir
         ```
     * View logs for a specific service
         ```
-        docker service logs prom_<service_name>
+        docker service logs monitoring_<service_name>
         ```
 
 That's it the `docker stack deploy' command deploys the entire Grafana and Prometheus stack automatically to the Docker Swarm. By default cAdvisor and node-exporter are set to Global deployment which means they will propagate to every docker host attached to the Swarm.
@@ -46,13 +49,13 @@ The Grafana Dashboard is now accessible via: `http://<Host IP Address>:3000` for
 	username - admin
 	password - v12as34t (Password is stored in the `/grafana/config.monitoring` env file)
 ```
-## Add Datasources and Dashboards
+## 📁 Add Datasources and Dashboards
 Grafana version 5.0.0 has introduced the concept of provisioning. This allows us to automate the process of adding Datasources & Dashboards. The [/grafana/provisioning](grafana/provisioning) directory contains the `datasources` which has two datasouces [prometheus](grafana/provisioning/datasources/datasource.yaml) and [loki](grafana/provisioning/datasources/ds.yaml) and `dashboards` directories. These directories contain YAML files which allow us to specify which datasource or dashboards should be installed. 
 
 If you would like to automate the installation of additional dashboards just copy the Dashboard `JSON` file to `/grafana/provisioning/dashboards` and it will be provisioned next time you stop and start Grafana.
 
 
-## Install Dashboards the old way
+## 🕹️ Install Dashboards the old way
 
 Created a Dashboard template which is available on [Grafana Docker Dashboard](https://grafana.com/grafana/dashboards/179). 
 
@@ -62,16 +65,16 @@ This dashboard is intended to help you get started with monitoring.
 
 Added more dashboards like ID 13112, 16310 and will be adding more in future.
 
-### Add Additional Datasources
+### ➕ Add Additional Datasources
 Now we need to create the Prometheus Datasource in order to connect Grafana to Prometheus 
-* Click the `Grafana` Menu at the top left corner (looks like a fireball)
-* Click `Data Sources`
+* Click the Menu at the top left corner 
+* Click ON `Connections` -> `Data Sources`
 * Click the green button `Add Data Source`.
 
 **Ensure the Datasource name `Prometheus`is using uppercase `P`**
 
 
-## Alerting
+## 🚨 Alerting
 
 Alerting has been added to the stack with Email and Slack integration. Alerts have been added and are managed
 
@@ -96,7 +99,7 @@ The Slack configuration requires to build a custom integration.
 View Prometheus alerts `http://<Host IP Address>:9090/alerts`
 View Alert Manager `http://<Host IP Address>:9093`
 
-## Test Alerts
+## 🧪 Test Alerts
 
 A quick test for alerts is to stop a service. Stop the node_exporter container and you should notice shortly the alert arrive in mail and slack. Also check the alerts in both the Alert Manager and Prometheus Alerts just to understand how they flow through the system.
 
@@ -105,7 +108,7 @@ High load test alert - `docker run --rm -it busybox sh -c "while true; do :; don
 Let this run for a few minutes and you will notice the load alert appear. Then Ctrl+C to stop this container.
 
 
-## Logs Visulization with Loki and Promtail
+## 📦 Logs Visulization with Loki and Promtail
 
 To monitor system logs, configuration is aready ready in [/promtal/config.yaml](promtail/config.yaml).
 
@@ -123,12 +126,33 @@ If you want to monitor any other logs then provide that file path in commented l
 
 For mor details go through [Loki] (https://github.com/grafana/loki/tree/main/production)
 
-# To remove everything
+# 🧹 Cleanup
 1. If docker-compose file used:
     ```
     docker compose down
     ```
 2. If docker-stack file used:
     ```
-    docker stack rm prom
+    docker stack rm monitoring
     ```
+## 🧭 Observability Architecture
+
+This stack uses a combination of Prometheus, Loki, Alertmanager, Grafana, and exporters to provide a full observability solution for Docker-based environments.
+
+Here’s how the components interact:
+
+[Observability Architecture](docs/observability.png)
+
+- **Logs**: Collected via `Promtail` and pushed to `Loki`
+- **Metrics**: Scraped from `Node Exporter` and `cAdvisor` into `Prometheus`
+- **Alerting**: Alerts defined in Prometheus and handled by `Alertmanager`
+- **Visualization**: `Grafana` queries Prometheus (metrics) and Loki (logs), and displays dashboards + alerts to users
+
+## 🧠 Why cAdvisor?
+
+cAdvisor provides per-container resource usage and performance characteristics — critical for container monitoring in Prometheus.
+
+It runs as a lightweight daemon and exports data such as:
+
+- CPU, memory, disk I/O, and network usage per container
+- Docker label metadata (great for multi-tenant observability)

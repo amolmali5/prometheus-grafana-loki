@@ -1,0 +1,4 @@
+# This will ignore all files in the root directory
+# except for the .gitignore file itself.
+/grafana_data
+!.gitignore
